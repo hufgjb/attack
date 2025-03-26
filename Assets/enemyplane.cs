@@ -1,20 +1,38 @@
 ﻿using UnityEngine;
 
-public class enemyplane : MonoBehaviour
+public class EnemyPlane : MonoBehaviour
 {
     public float moveSpeed = 3f; // 移動速度
     public int health = 3; // 生命值
+    private Transform player; // 主角的 Transform
+
+    void Start()
+    {
+        // 嘗試尋找 Player 物件
+        GameObject playerObj = GameObject.FindWithTag("Player");
+        if (playerObj != null)
+        {
+            player = playerObj.transform;
+        }
+    }
 
     void Update()
     {
-        // 讓敵機面向 -X 軸
-        transform.rotation = Quaternion.Euler(90f, 180f, 0);
+        if (player != null)
+        {
+            // 計算朝向 Player 的方向向量
+            Vector2 direction = (player.position - transform.position).normalized;
 
-        // 向左移動
-        transform.Translate(Vector2.right * moveSpeed * Time.deltaTime);
+            // 讓敵機面向 Player
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(0, 0, angle);
+
+            // 朝向 Player 移動
+            transform.position += (Vector3)direction * moveSpeed * Time.deltaTime;
+        }
 
         // 超出屏幕後銷毀
-        if (transform.position.y < -10f)
+        if (transform.position.x < -10f)
         {
             Destroy(gameObject);
         }
